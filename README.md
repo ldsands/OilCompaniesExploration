@@ -15,8 +15,7 @@ uv sync
 
 ```sh
 uv init OilCompaniesExploration
-uv add streamlit polars pyarrow
-
+uv add streamlit polars pyarrow plotly
 ```
 
 - You MUST create a requirements.txt to run in streamlit
