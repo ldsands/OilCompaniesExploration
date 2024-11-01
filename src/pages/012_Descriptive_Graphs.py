@@ -93,11 +93,11 @@ def main() -> None:
     # functs.display_graph(fig, fig_title, fig_dta)
     # display_graph(fig, fig_title, fig_dta)
 
-    dictionary_dicts = functs.create_dictionary_dicts()
-    for dictionary_name, dictionary_dict in dictionary_dicts.items():
-        st.write(
-            f"### {dictionary_dict['label']} ({dictionary_name}) dictionary:\ndictionary terms: {', '.join(dictionary_dict['terms'])}"
-        )
+    # dictionary_dicts = functs.create_dictionary_dicts()
+    # for dictionary_name, dictionary_dict in dictionary_dicts.items():
+    #     st.write(
+    #         f"### {dictionary_dict['label']} ({dictionary_name}) dictionary:\ndictionary terms: {', '.join(dictionary_dict['terms'])}"
+    #     )
     st.sidebar.write(print_updated_time())  # PROGRESSTRACKING:
     print(print_updated_time())  # PROGRESSTRACKING:
 
