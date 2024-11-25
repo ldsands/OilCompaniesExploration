@@ -63,7 +63,7 @@ def create_dictionary_dicts():
             "label": "Climate Change Dictionary",
             "terms": {
                 "climate change": "#c97a55",
-                "net-zero": "#827cde",
+                # "net-zero": "#827cde",
                 "net zero": "#a08e33",
                 "greenhouse gas": "#9f479a",
                 "GHG": "#9b341e",

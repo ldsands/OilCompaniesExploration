@@ -54,6 +54,36 @@ def graph_terms_by_date_prop(fig_dta: pl.DataFrame, term_col_names: list[str]):
     return fig, fig_title, fig_dta
 
 
+def graph_terms_by_date_prop_companies(
+    fig_dta: pl.DataFrame, term_col_names: list[str], companies_selection: list[str]
+):
+    fig_title = "Terms by Date Proportion of Words"
+    col_names = term_col_names.copy()
+    col_names.append("year_month_dt")
+    col_names.append("word_count")
+    col_names.append("company_name")
+    # filter to selected companies
+    # TODO: issue with constantly reloading the company list
+    st.write(companies_selection)  # TEMPCODE: Remove
+    st.write(fig_dta.shape)  # TEMPCODE: Remove
+    # fig_dta = fig_dta.filter(pl.col("company_name").is_in(["BP", "Shell"]))
+    fig_dta = fig_dta.filter(pl.col("company_name").is_in(companies_selection))
+    # TODO: pick up here
+    st.write(fig_dta.shape)  # TEMPCODE: Remove
+    st.write(fig_dta.columns)  # TEMPCODE: Remove
+    fig_dta = fig_dta.select(pl.col(col_names))
+    fig_dta = fig_dta.group_by(pl.col("year_month_dt")).sum().sort("year_month_dt")
+    # st.write(fig_dta)  # TEMPPRINT:
+    for term in term_col_names:
+        fig_dta = fig_dta.with_columns(
+            (pl.col(term) / pl.col("word_count")).alias(f"{term.replace('_count', '_prop')}")
+        )
+    term_prop_cols = [term.replace("_count", "_prop") for term in term_col_names]
+    # st.write(fig_dta)  # TEMPPRINT:
+    fig = px.line(fig_dta, x="year_month_dt", y=term_prop_cols, title=fig_title)
+    return fig, fig_title, fig_dta
+
+
 def graph_post_by_date_by_company(fig_dta: pl.DataFrame):
     fig_title = "Posts by Company by Date"
     fig = px.line(
@@ -106,6 +136,18 @@ def main() -> None:
         fig, fig_title, fig_dta = graph_terms_by_date_prop(dta, term_col_names)
         st.plotly_chart(fig, use_container_width=True)
         display_graph_dta(fig_dta, fig_title)
+
+    # companies_selection = st.multiselect(
+    #     label="Select Companies to Include in Line Graphs",
+    #     options=dta["company_name"].unique().to_list(),
+    # )
+    companies_selection = st.selectbox(
+        label="Select Companies to Include in Line Graphs",
+        options=dta["company_name"].unique().to_list(),
+    )
+    fig, fig_title, fig_dta = graph_terms_by_date_prop_companies(
+        dta, term_col_names, companies_selection
+    )
 
     # dta_by_date = get_posts_by_date(dta)
     # fig, fig_title, fig_dta = graph_post_by_date(dta_by_date)
