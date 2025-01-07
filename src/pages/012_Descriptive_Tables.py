@@ -82,6 +82,7 @@ def main() -> None:
     # get total word count by company
     dta_total_word_count = dta[["company_name", "word_count"]]
     dta_total_word_count = dta.group_by(pl.col("company_name")).agg(pl.sum("word_count"))
+    dta_total_word_count = dta_total_word_count.sort("company_name")
     st.write("## Total Word Count by Company")
     st.write(dta_total_word_count)
     st.sidebar.write(functs.print_updated_time())  # PROGRESSTRACKING:
