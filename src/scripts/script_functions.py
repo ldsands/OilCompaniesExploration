@@ -209,6 +209,43 @@ def get_dict_term_count(dta: pl.DataFrame, dict_terms: list[str]) -> tuple[pl.Da
     return dta, term_col_names
 
 
+def get_term_count(dta: pl.DataFrame, term: str) -> tuple[pl.DataFrame, list[str]]:
+    """
+    Calculate the count of dictionary terms in the 'text' column of the given DataFrame.
+
+    This function performs the following steps:
+    1. Converts the text in the 'text' column to lowercase.
+    2. Counts the occurrences of each dictionary term in the 'text' column.
+    3. Renames the count column to 'term_count'.
+    4. Drops the intermediate 'term_count' column.
+
+    Args:
+        dta (pl.DataFrame): A Polars DataFrame containing a 'text' column with text data.
+        dict_terms (list[str]): A list of dictionary terms to count in the text data.
+
+    Returns:
+        pl.DataFrame: A Polars DataFrame with an additional 'term_count' column representing the count of
+                     dictionary terms in each row.
+    """
+    if "," in term:
+        target_terms = term.split(",")
+    else:
+        target_terms = [term]
+    for term in target_terms:
+        target_term = term.lower()
+        dta = dta.with_columns(
+            pl.col("clean_text")
+            .str.count_matches(target_term)
+            .cast(pl.Int32)
+            .alias(f"{term}_count")
+            # pl.col("clean_text").str.contains(target_term).cast(pl.Int32).alias(f"{term}_count")
+        )
+    # st.write(dta)  # TEMPPRINT:
+    term_col_names = [f"{term}_count" for term in target_terms]
+    # st.write(term_col_names)  # TEMPPRINT:
+    return dta, term_col_names
+
+
 def load_dta():
     def get_dirs() -> Path:
         parent_dir = Path(__file__).parent.parent
