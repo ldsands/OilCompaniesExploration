@@ -23,7 +23,7 @@ def get_posts_by_date(dta: pl.DataFrame) -> pl.DataFrame:
 
 
 def graph_post_by_date(fig_dta: pl.DataFrame):
-    fig_title = "Posts by Date"
+    fig_title = "Total Posts by Date"
     # fig = alt.Chart(fig_dta).mark_line().encode(x="year_month_dt", y="count", color="company_name")
     fig = px.line(fig_dta, x="year_month_dt", y="count", title=fig_title)
     return fig, fig_title, fig_dta
