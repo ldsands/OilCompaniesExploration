@@ -63,7 +63,7 @@ def main() -> None:
     dta = functs.load_dta()
     dta = functs.get_year_selection_filter_bar(dta)
     dta = functs.get_article_word_count(dta)
-    dta = dta.drop(["source_url", "file_name", "text", "year", "month"])
+    dta = dta.drop(["source_url", "text", "year", "month"])
     # get start year by company
     dta_start_year = dta[["company_name", "year_int"]]
     dta_start_year = dta_start_year.group_by(pl.col("company_name")).agg(pl.min("year_int"))
