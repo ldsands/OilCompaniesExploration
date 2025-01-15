@@ -60,18 +60,18 @@ def graph_terms_by_date_prop_companies(
     companies_selection_string = ", ".join(companies_selection)
     fig_title = f"Terms by Date Proportion of Words ({companies_selection_string})"
     col_names = term_col_names.copy()
-    col_names.append("year_month_dt")
     col_names.append("word_count")
     col_names.append("company_name")
     # filter to selected companies
     fig_dta = fig_dta.filter(pl.col("company_name").is_in(companies_selection))
     fig_dta = fig_dta.select(pl.col(col_names))
     fig_dta = fig_dta.group_by(pl.col("year_month_dt")).sum().sort("year_month_dt")
-    # st.write(fig_dta)  # TEMPPRINT:
     for term in term_col_names:
-        fig_dta = fig_dta.with_columns(
-            (pl.col(term) / pl.col("word_count")).alias(f"{term.replace('_count', '_prop')}")
-        )
+        if "count" in term:
+            st.write(term)  # TEMPCODE: Remove
+            fig_dta = fig_dta.with_columns(
+                (pl.col(term) / pl.col("word_count")).alias(f"{term.replace('_count', '_prop')}")
+            )
     term_prop_cols = [term.replace("_count", "_prop") for term in term_col_names]
     # st.write(fig_dta)  # TEMPPRINT:
     fig = px.line(fig_dta, x="year_month_dt", y=term_prop_cols, title=fig_title)
@@ -112,7 +112,7 @@ def main() -> None:
     page_title = "Basic Descriptive Graphs"
     functs.set_page_configs(page_title)
     dictionary_dicts = functs.create_dictionary_dicts()
-    dict_key, dict_label, dict_terms, dict_terms_colors = functs.select_dictionary(dictionary_dicts)
+    # dict_key, dict_label, dict_terms, dict_terms_colors = functs.select_dictionary(dictionary_dicts)
 
     dta = functs.load_dta()
     dta = functs.get_year_selection_filter_bar(dta)
@@ -120,7 +120,7 @@ def main() -> None:
     dta = functs.get_article_word_count(dta)
     # st.write(f"dta.columns: {dta.columns}")  # TEMPPRINT:
     dta = functs.get_word_count_by_month_by_company(dta)
-    dta, term_col_names = functs.get_dict_term_count(dta, dict_terms)
+    # dta, term_col_names = functs.get_dict_term_count(dta, dict_terms)
     user_term = st.text_input(
         "Enter a Term to Graph\n\nIf you want to use more than 1 term separate them by using the character ',' do not include spaces\n\n\nYou can also use the pipe character to combine terms using regex (and thus combine them into one line)\n\nExample: scope 1|scope 2|scope 3",
         "scope 1,scope 2,scope 3",
