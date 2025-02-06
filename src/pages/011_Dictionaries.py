@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import polars as pl
 import streamlit as st
 
 import scripts.script_functions as functs
@@ -10,10 +9,6 @@ def get_dirs() -> Path:
     parent_dir = Path(__file__).parent.parent
     dataframe_dir = parent_dir / "Dataframes"
     return dataframe_dir
-
-
-def load_dta(dataframe_dir) -> pl.DataFrame:
-    return pl.read_parquet((dataframe_dir / "combined_oil_company_dta.parquet"))
 
 
 def main() -> None:
