@@ -37,7 +37,7 @@ def graph_terms_by_date_raw_count(fig_dta: pl.DataFrame, term_col_names: list[st
 
 
 def graph_terms_by_date_prop(fig_dta: pl.DataFrame, term_col_names: list[str]):
-    fig_title = "Terms by Date Proportion of Words"
+    fig_title = "Terms by Date Proportion of Words (All Companies)"
     col_names = term_col_names.copy()
     col_names.append("year_month_dt")
     col_names.append("word_count")
