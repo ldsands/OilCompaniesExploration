@@ -113,7 +113,7 @@ def display_graph(fig_title, fig, fig_dta):
 
 
 def main() -> None:
-    page_title = "Basic Descriptive Graphs"
+    page_title = "String Graphs"
     functs.set_page_configs(page_title)
     dictionary_dicts = functs.create_dictionary_dicts()
     # dict_key, dict_label, dict_terms, dict_terms_colors = functs.select_dictionary(dictionary_dicts)

@@ -25,30 +25,19 @@ def get_posts_by_date_by_company(dta: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def graph_terms_by_date_raw_count(
-    fig_dta: pl.DataFrame, term_col_names: list[str], term_col_colors
-):
+def graph_terms_by_date_raw_count(fig_dta: pl.DataFrame, term_col_names: list[str]):
     fig_title = "Terms by Date Raw Count (All Companies)"
     col_names = term_col_names.copy()
     col_names.append("year_month_dt")
     fig_dta = fig_dta.select(pl.col(col_names))
     term_col_names.append("year_month_dt")
     fig_dta = fig_dta.group_by(pl.col("year_month_dt")).sum().sort("year_month_dt")
-    fig = px.line(
-        fig_dta,
-        x="year_month_dt",
-        y=term_col_names,
-        title=fig_title,
-        color_discrete_map=term_col_colors,
-    )
+    fig = px.line(fig_dta, x="year_month_dt", y=term_col_names, title=fig_title)
     return fig, fig_title, fig_dta
 
 
 def graph_terms_by_date_raw_count_companies(
-    fig_dta: pl.DataFrame,
-    term_col_names: list[str],
-    term_col_colors,
-    companies_selection: list[str],
+    fig_dta: pl.DataFrame, term_col_names: list[str], companies_selection: list[str]
 ):
     companies_selection_string = ", ".join(companies_selection)
     fig_title = f"Terms by Date Raw Count ({companies_selection_string})"
@@ -56,19 +45,11 @@ def graph_terms_by_date_raw_count_companies(
     fig_dta = fig_dta.select(pl.col(col_names))
     term_col_names.append("year_month_dt")
     fig_dta = fig_dta.group_by(pl.col("year_month_dt")).sum().sort("year_month_dt")
-    fig = px.line(
-        fig_dta,
-        x="year_month_dt",
-        y=term_col_names,
-        color_discrete_map=term_col_colors,
-        title=fig_title,
-    )
+    fig = px.line(fig_dta, x="year_month_dt", y=term_col_names, title=fig_title)
     return fig, fig_title, fig_dta
 
 
-def graph_terms_by_date_prop(
-    fig_dta: pl.DataFrame, term_col_names: list[str], term_col_colors: dict
-):
+def graph_terms_by_date_prop(fig_dta: pl.DataFrame, term_col_names: list[str]):
     fig_title = "Terms by Date Proportion of Words (All Companies)"
     col_names = term_col_names.copy()
     col_names.append("year_month_dt")
@@ -82,21 +63,12 @@ def graph_terms_by_date_prop(
         )
     term_prop_cols = [term.replace("_count", "_prop") for term in term_col_names]
     # st.write(fig_dta)  # TEMPPRINT:
-    fig = px.line(
-        fig_dta,
-        x="year_month_dt",
-        y=term_prop_cols,
-        color_discrete_map=term_col_colors,
-        title=fig_title,
-    )
+    fig = px.line(fig_dta, x="year_month_dt", y=term_prop_cols, title=fig_title)
     return fig, fig_title, fig_dta
 
 
 def graph_terms_by_date_prop_companies(
-    fig_dta: pl.DataFrame,
-    term_col_names: list[str],
-    term_col_colors: dict,
-    companies_selection: list[str],
+    fig_dta: pl.DataFrame, term_col_names: list[str], companies_selection: list[str]
 ):
     companies_selection_string = ", ".join(companies_selection)
     fig_title = f"Terms by Date Proportion of Words ({companies_selection_string})"
@@ -112,13 +84,7 @@ def graph_terms_by_date_prop_companies(
             (pl.col(term) / pl.col("word_count")).alias(f"{term.replace('_count', '_prop')}")
         )
     term_prop_cols = [term.replace("_count", "_prop") for term in term_col_names]
-    fig = px.line(
-        fig_dta,
-        x="year_month_dt",
-        y=term_prop_cols,
-        color_discrete_map=term_col_colors,
-        title=fig_title,
-    )
+    fig = px.line(fig_dta, x="year_month_dt", y=term_prop_cols, title=fig_title)
     return fig, fig_title, fig_dta
 
 
@@ -153,7 +119,7 @@ def display_graph(fig_title, fig, fig_dta):
 
 
 def main() -> None:
-    page_title = "Basic Dictionary Graphs"
+    page_title = "Basic Dictionary Term Graphs"
     functs.set_page_configs(page_title)
     dictionary_dicts = functs.create_dictionary_dicts()
     dict_key, dict_label, dict_terms, dict_terms_colors = functs.select_dictionary(dictionary_dicts)
@@ -164,15 +130,10 @@ def main() -> None:
     dta = functs.get_article_word_count(dta)
     # st.write(f"dta.columns: {dta.columns}")  # TEMPPRINT:
     dta = functs.get_word_count_by_month_by_company(dta)
-    dta, term_col_names, term_col_colors = functs.get_dicts_combined_term_count(
-        dta, dictionary_dicts
-    )
-    # dta, term_col_names = functs.get_dict_term_count(dta, dict_terms)
+    dta, term_col_names = functs.get_dict_term_count(dta, dict_terms)
     raw_counts_selection = st.checkbox("Show Raw Counts?", value=False)
     if raw_counts_selection:
-        fig, fig_title, fig_dta = graph_terms_by_date_raw_count(
-            dta, term_col_names, term_col_colors
-        )
+        fig, fig_title, fig_dta = graph_terms_by_date_raw_count(dta, term_col_names)
         st.plotly_chart(fig, use_container_width=True)
         display_graph_dta(fig_dta, fig_title)
         companies_selection = st.segmented_control(
@@ -180,15 +141,13 @@ def main() -> None:
             options=dta["company_name"].unique().sort().to_list(),
             selection_mode="multi",
         )
-        fig, fig_title, fig_dta = graph_terms_by_date_raw_count_companies(  # todo:
-            dta, term_col_names, term_col_colors, companies_selection
+        fig, fig_title, fig_dta = graph_terms_by_date_raw_count_companies(
+            dta, term_col_names, companies_selection
         )
         st.plotly_chart(fig, use_container_width=True)
         display_graph_dta(fig_dta, fig_title)
     else:
-        fig, fig_title, fig_dta = graph_terms_by_date_prop(
-            dta, term_col_names, term_col_colors
-        )  # todo:
+        fig, fig_title, fig_dta = graph_terms_by_date_prop(dta, term_col_names)
         st.plotly_chart(fig, use_container_width=True)
         display_graph_dta(fig_dta, fig_title)
         companies_selection = st.segmented_control(
@@ -196,8 +155,8 @@ def main() -> None:
             options=dta["company_name"].unique().sort().to_list(),
             selection_mode="multi",
         )
-        fig, fig_title, fig_dta = graph_terms_by_date_prop_companies(  # todo:
-            dta, term_col_names, term_col_colors, companies_selection
+        fig, fig_title, fig_dta = graph_terms_by_date_prop_companies(
+            dta, term_col_names, companies_selection
         )
         st.plotly_chart(fig, use_container_width=True)
         display_graph_dta(fig_dta, fig_title)

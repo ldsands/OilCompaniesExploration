@@ -61,6 +61,7 @@ def create_dictionary_dicts():
     dictionary_dicts = {
         "GOVERNANCE": {
             "label": "Governance",
+            "dict_color": "#808080",
             "terms": {
                 "transparency": "#FF0000",
                 "ethics": "#aa0000",
@@ -85,6 +86,7 @@ def create_dictionary_dicts():
         },
         "SOCIAL": {
             "label": "Social",
+            "dict_color": "#0000FF",
             "terms": {
                 "accommodate": "#FF0000",
                 "accommodating": "#aa0000",
@@ -394,6 +396,7 @@ def create_dictionary_dicts():
         },
         "ENVIRONMENT": {
             "label": "Environment",
+            "dict_color": "#00FF00",
             "terms": {
                 "acid rain": "#FF0000",
                 "acid rains": "#aa0000",
@@ -647,6 +650,7 @@ def create_dictionary_dicts():
         },
         "CSR": {
             "label": "CSR",
+            "dict_color": "#800080",
             "terms": {
                 "csr": "#FF0000",
                 "corporate social responsibility": "#aa0000",
@@ -661,6 +665,7 @@ def create_dictionary_dicts():
         },
         "CLIMATE CHANGE": {
             "label": "Climate Change",
+            "dict_color": "#00FFFF",
             "terms": {
                 "climate change": "#FF0000",
                 "global warming": "#aa0000",
@@ -700,6 +705,7 @@ def create_dictionary_dicts():
         },
         "RENEWABLES": {
             "label": "Renewables",
+            "dict_color": "#FF8C00",
             "terms": {
                 "renewable energy": "#FF0000",
                 "clean energy": "#aa0000",
@@ -722,6 +728,7 @@ def create_dictionary_dicts():
         },
         "BIOMASS": {
             "label": "Biomass",
+            "dict_color": "#DAA520",
             "terms": {
                 "biomass": "#FF0000",
                 "algae": "#aa0000",
@@ -733,6 +740,7 @@ def create_dictionary_dicts():
         },
         "CLIMATE CHANGE SMALL": {
             "label": "Climate Change Small",
+            "dict_color": "#009999",
             "terms": {
                 "climate change": "#aa0000",
                 "global warming": "#00FF00",
@@ -740,6 +748,7 @@ def create_dictionary_dicts():
         },
         "CARBON CAPTURE": {
             "label": "Carbon Capture",
+            "dict_color": "#FFFF00",
             "terms": {
                 "global warming": "#FF0000",
                 "carbon sequestration": "#aa0000",
@@ -870,6 +879,46 @@ def select_dictionary(dictionary_dicts):
     # st.write(f"dict_terms:\n{dict_terms}\n\n")  # TEMPPRINT:
     # st.write(f"dict_terms_colors:\n{dict_terms_colors}\n\n")  # TEMPPRINT:
     return dict_key, dict_label, dict_terms, dict_terms_colors
+
+
+def get_dicts_combined_term_count(dta: pl.DataFrame, dictionary_dicts):
+    """
+    Combines terms from multiple dictionaries and counts their occurrences in a DataFrame column.
+    Args:
+        dta (pl.DataFrame): A Polars DataFrame containing a column named 'clean_text' where term occurrences will be counted.
+        dictionary_dicts (dict): A dictionary of dictionaries, where each key is a dictionary name and each value is a dictionary
+                                 containing 'terms' (a dictionary of terms to count) and 'label' (a label for the term count column).
+                                 Each dictionary should also contain 'dict_color' for the color associated with the term count.
+    Returns:
+        tuple: A tuple containing:
+            - dta (pl.DataFrame): The updated DataFrame with new columns for each dictionary's term count.
+            - term_col_names (list): A list of the new column names added to the DataFrame.
+            - term_col_colors (dict): A dictionary mapping each new column name to its associated color.
+    """
+    dict_keys = [dictionary_dict for dictionary_dict in dictionary_dicts.keys()]
+    for dict_key in dict_keys:
+        dict_terms = dictionary_dicts[dict_key]["terms"].keys()
+        dict_terms = "|".join(dict_terms)
+        dictionary_dicts[dict_key]["combined_terms"] = dict_terms
+    dictionary_dicts
+    term_col_names = []
+    term_col_colors = {}
+    for dict_key in dict_keys:
+        combined_terms = dictionary_dicts[dict_key]["combined_terms"]
+        dict_label = dictionary_dicts[dict_key]["label"]
+        term_col_colors.update({f"{dict_label} count": dictionary_dicts[dict_key]["dict_color"]})
+        term_col_names.append(f"{dict_label} count")
+        combined_terms = combined_terms.lower()
+        dta = dta.with_columns(
+            pl.col("clean_text")
+            .str.count_matches(combined_terms)
+            .cast(pl.Int32)
+            .alias(f"{dict_label} count")
+        )
+    # st.write(dta)  # TEMPPRINT:
+    # st.write(term_col_names)  # TEMPPRINT:
+    # st.write(term_col_colors)  # TEMPPRINT:
+    return dta, term_col_names, term_col_colors
 
 
 def get_dict_term_count(dta: pl.DataFrame, dict_terms: list[str]) -> tuple[pl.DataFrame, list[str]]:
