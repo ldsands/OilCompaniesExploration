@@ -738,14 +738,6 @@ def create_dictionary_dicts():
                 "biofuels": "#006400",
             },
         },
-        "CLIMATE CHANGE SMALL": {
-            "label": "Climate Change Small",
-            "dict_color": "#009999",
-            "terms": {
-                "climate change": "#aa0000",
-                "global warming": "#00FF00",
-            },
-        },
         "CARBON CAPTURE": {
             "label": "Carbon Capture",
             "dict_color": "#FFFF00",
